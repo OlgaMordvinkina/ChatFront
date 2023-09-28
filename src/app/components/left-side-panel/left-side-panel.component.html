@@ -1,0 +1,48 @@
+<div id="settingsProfile">
+    <div class="photoProfile" style="display: grid; grid-template-rows: 200px auto;">
+        <button (click)="openDialogViewingImages(currentProfile.photo)">
+            <img src="{{currentProfile.photo !== null ? currentProfile.photo : 'assets/icon-chats.svg'}}" style="border-radius: 50%; height: 120px; width: 120px;">
+        </button>
+        <h1>{{ currentProfile.surname }} {{ currentProfile.name }}</h1>
+        <h2>{{ currentUser.email }}</h2>
+    </div>
+    <div class="settings">
+        <button class="change" (click)="openDialog('PHOTO')">
+            <div class="settingIcon">
+            <img id="iconPhoto" src="assets/photo-profile-icon.svg">
+            </div>
+            <span><li>Изменить фото профиля</li></span>
+        </button>
+        <button class="change" (click)="openDialog('NAME')">
+            <div class="settingIcon">
+            <img id="iconNames" src="assets/name-lastname-icon.svg" style="display: block;">
+            </div>
+            <span><li>Изменить имя и фамилию</li></span>
+        </button>
+        <button class="change" (click)="openDialog('EMAIL')">
+            <div class="settingIcon">
+            <img id="iconEmail" src="assets/email-icon.svg" style="display: block;">
+            </div>
+            <span><li>Изменить почту</li></span>
+        </button>
+        <button class="change" (click)="openDialog('PASSWORD')">
+            <div class="settingIcon">
+            <img id="iconPassword" src="assets/password-icon.svg" style="display: block;">
+            </div>
+            <span><li>Изменить пароль</li></span>
+        </button>
+        <button class="change" (click)="openDialog('SOUND')">
+            <div class="settingIcon">
+            <img id="iconSound" src="assets/sound-icon.svg" style="display: block;">
+            </div>
+            <span><li>Звук сообщений</li></span>
+        </button>
+    </div>
+    <button class="change" (click)="logoutFromProfile()">
+    <div class="settingIcon">
+        <img id="iconExit" src="assets/exit.svg" style="display: block;">
+    </div>
+    <span><li>Выйти из профиля</li></span>
+    </button>
+</div>
+<div id="closeMenu" class="zoneClosing" value="Click" (mousedown)="closeLeftMenu()"></div>

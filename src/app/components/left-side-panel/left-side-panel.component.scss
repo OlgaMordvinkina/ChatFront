@@ -1,0 +1,88 @@
+$orange: #944710;
+$grey5: #0e0e0e;
+
+#settingsProfile {
+    display: grid ;
+    grid-template-rows: 250px auto 56px;
+    background-color: $grey5;
+    z-index: 101;
+    transition: transform 0.3s ease;
+    -webkit-box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+}
+
+.photoProfile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.photoProfile h1 {
+    text-align: center;
+}
+
+.photoProfile h2 {
+    text-align: center;
+}
+
+.photoProfile img {
+    justify-self: center;
+}
+
+.settings {
+    margin-top: 30px;
+}
+
+.change {
+    width: 360px;
+    display: grid;
+    grid-template-columns: 96px auto;
+    padding: 4px 0 4px;
+    color: white;
+    font-size: 14px; 
+    opacity: 0.8;
+}
+
+.change:hover {
+    background-color: rgba($color: $orange, $alpha: 0.3);
+}
+
+.settingIcon {
+    display: flex;
+    justify-content: center;
+    margin-left: 26px;
+    padding: 6px;
+    align-self: center;
+}
+
+.change:hover #iconPhoto,
+.change:hover #iconNames,
+.change:hover #iconEmail,
+.change:hover #iconPassword,
+.change:hover #iconSound,
+.change:hover #iconExit {
+    filter: brightness(0);
+}
+
+.zoneClosing {
+    display: flex;
+    min-width: 100%;
+    z-index: 102;
+}
+
+span {
+    display: flex;
+    vertical-align: middle;
+    align-items: center;
+    justify-self: start;
+    width: 100%;
+    height: 100%;
+}
+
+div {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

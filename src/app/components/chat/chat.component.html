@@ -1,0 +1,130 @@
+<div class="chatContent">
+    <div class="chatHeader">
+        <div class="informationsChat">
+            <h1>{{ currentChat.title }}</h1>
+            <h2 *ngIf="currentChat.type === 'PRIVATE'">{{ getOnlineDate() }}</h2>
+            <h2 *ngIf="currentChat.type === 'GROUP'">{{ getNumberParticipants() }}</h2>
+        </div>
+        <div class="actions">
+                <label id="searchInChat" class="search" for="inpt_search">
+                    <input id="input_search" [(ngModel)]="searchText" type="text" placeholder=" Поиск" autocomplete="off">
+                </label>
+                <div id="modal_search" *ngIf="searchText !== ''">
+                    <button id="answer_list" *ngFor="let message of foundMessages" (click)="goToMessage(message.id)">
+                        <div class="chatIcon"></div>
+                        <div class="infoFindMessage">
+                            <h2>{{ currentChat.title }}</h2> 
+                            <div class="messageInfo">
+                                <p>{{ message.sender?.surname }} {{ message.sender?.name }}</p>
+                                <p>: {{ message.text }}</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+            <button (click)="openRightMenu()">
+                <svg width="30" height="18" viewBox="0 0 30 18" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 16C0 14.8954 0.895431 14 2 14H28C29.1046 14 30 14.8954 30 16C30 17.1046 29.1046 18 28 18H2C0.89543 18 0 17.1046 0 16Z" fill="#898989"/>
+                <path d="M0 9C0 7.89543 0.895431 7 2 7H28C29.1046 7 30 7.89543 30 9C30 10.1046 29.1046 11 28 11H2C0.89543 11 0 10.1046 0 9Z" fill="#898989"/>
+                <path d="M0 2C0 0.895431 0.895431 0 2 0H28C29.1046 0 30 0.895431 30 2C30 3.10457 29.1046 4 28 4H2C0.89543 4 0 3.10457 0 2Z" fill="#898989"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="chatsContent" class="chat-container" #messageContainer>
+        <div class="text" *ngIf="messages.messages.length === 0 && messages.chatId !== 0">Напишите первым!</div>
+
+        <div  id="message{{ message.id }}" class="all-message" *ngFor="let message of messages.messages" [ngClass]="{'own-message': equals(message.sender?.userId), 'other-message': !equals(message.sender?.userId)}" (contextmenu)="handleContextMenu($event, message)">
+            <div class="message" [title]="formatDate(message.createDate)" (click)="addForwardMessage(message)">
+                <img class="forwardMessages" *ngIf="isForward(message)" src="assets/sent-message-icon.svg">
+
+                <button class="replyMessage" *ngIf="message.replyMessage?.id" (click)="goToReplyMessage(message)">
+                    <div *ngIf="message.replyMessage?.sender?.id !== currentUserId" class="authorMessage">{{message.replyMessage?.sender?.surname}} {{message.replyMessage?.sender?.name}}:</div>
+                    <div *ngIf="message.replyMessage?.sender?.id === currentUserId" class="authorMessage">Вы:</div>
+                    <div class="contentMessage">
+                        <p>{{message.replyMessage?.text}}</p>
+                    </div>
+                </button>
+                <div class="replyMessage" *ngIf="message.replyMessage?.id === 0">Сообщение удалено</div>
+
+                <h2 *ngIf="!equals(message.sender?.userId) && currentChat.type === 'GROUP'">{{ message.sender?.surname }} {{ message.sender?.name }}</h2>
+                <p>{{ message.text }}</p>
+
+                <div class="messageAttachments">
+                    <button (click)="openDialogViewingImages(img.file)" *ngFor="let img of message.attachments" style="width: 180px; height: 180px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img id="attachmentMessage" [src]="img.file" style=" width: auto; height: inherit; border-radius: 4px; object-fit: contain;">
+                    </button>
+                </div>
+
+                <div *ngFor="let msg of message.forwardFrom" class="forwardFrom" [ngClass]="{'own': msg.sender?.id === currentUserId, 'other': msg.sender?.id !== currentUserId}">
+                    <div *ngIf="msg.sender?.id !== currentUserId" class="authorMessage">{{msg.sender?.surname}} {{msg.sender?.name}}:</div>
+                    <div *ngIf="msg.sender?.id === currentUserId" class="authorMessage">Вы:</div>
+                    <div class="contentForwardMessage">
+                        <p>{{msg.text}}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="message-options" [style.left.px]="clickX" [style.top.px]="clickY" *ngIf="message.id === activeMessageId">
+                <button (click)="editMessage(message)" *ngIf="equals(message.sender?.userId)"><p>Редактировать</p></button>
+                <button (click)="deleteMessage(message)" *ngIf="equals(message.sender?.userId)"><p>Удалить</p></button>
+                <button (click)="replyToMessage(message)"><p>Ответить</p></button>
+                <button (click)="forwardMessage(message)"><p>Переслать</p></button>
+                <button (click)="copyMessage(message)"><p>Копировать</p></button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="writing">
+        <div *ngIf="replyMessage?.id !== null" class="replyMessages">
+            <div class="replyMessagesContent">
+                <div *ngIf="replyMessage.id !== 0">
+                    <div *ngIf="replyMessage?.sender?.id !== currentUserId" class="authorMessage">{{replyMessage.sender?.surname}} {{replyMessage.sender?.name}}:</div>
+                    <div *ngIf="replyMessage?.sender?.id === currentUserId" class="authorMessage">Вы:</div>
+                    <div class="contentMessage">{{replyMessage.text}}</div>  
+                </div>
+            </div>
+                
+            <button (click)="removeReplyToMessage()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
+                <line x1="0" y1="0" x2="10" y2="10" stroke="black" stroke-width="1" />
+                <line x1="0" y1="10" x2="10" y2="0" stroke="black" stroke-width="1" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="attachmentsMessage" appHorizontalScroll>
+            <div class="attachmentsContainer {{attachment.id}}" *ngFor="let attachment of newMsg.attachments">
+                <ng-container> 
+                    <button class="removeAttachment" (click)="removeAttachment(attachment.id)">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
+                        <line x1="0" y1="0" x2="10" y2="10" stroke="black" stroke-width="1" />
+                        <line x1="0" y1="10" x2="10" y2="0" stroke="black" stroke-width="1" />
+                        </svg> 
+                    </button>
+                    <img id="uploadedImage" [src]="attachment.file" alt="Загруженное изображение" style="max-width: 150px; max-height: 80px;">
+                </ng-container>
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple hidden />
+        <button id="uploadAttachmentsButton" (click)="uploadAttachments()"><img src="assets/clip-icon.svg"></button>
+
+        <div class="textMessage">
+            <textarea type="text" [(ngModel)]="newMessage" class="entryField" placeholder="Введите сообщение" (keydown)="onKeyDown($event)" value="newMessage" rows="1"></textarea>
+        </div>
+        <div class="messageActions">
+            <button (click)="openDialog()"><img src="assets/smile-icon.svg"></button>
+            <button id="sendMessage" (click)="sendMessage()" [disabled]="!isValidMessage()"><img src="assets/sending-message-icon.svg"></button>
+        </div>
+
+        <!-- <div id="modal_emogi" *ngIf="isEmogi">
+            <button id="emogi_list" *ngFor="let message of foundMessages">
+                <div class="emogi"><p>emoji</p></div>
+            </button>
+        </div> -->
+   </div> 
+   <app-right-side-panel id="rightMenu" style="display: none;" [currentChat]="currentChat" [profile]="profile" (blurredBackgroundRemoveEmit)="blurredBackgroundRemove()"></app-right-side-panel>
+</div>

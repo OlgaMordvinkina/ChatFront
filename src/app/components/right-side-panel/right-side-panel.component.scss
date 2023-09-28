@@ -1,0 +1,101 @@
+$grey5: #0e0e0e;
+$grey3: #242424;
+
+.zoneClosing {
+    display: flex;
+    min-width: 100%;
+    z-index: 102;
+}
+
+#menuChat {
+    display: inline-block;
+    flex-direction: column;
+    background-color: $grey5;
+    transition: transform 0.3s ease;
+    -webkit-box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 27px 17px rgba(0, 0, 0, 0.5);
+}
+
+.chatInformations {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.participants {
+    margin-bottom: 54px;
+    overflow-y: auto;
+    background-color: #050505;
+    border-radius: 14px;
+    min-height: 68px;
+    max-height: 300px;
+}
+
+.infoChatsParticipants {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-left: 32px;
+}
+
+.removalChat {
+    margin-bottom: 30px;
+    color: white;
+}
+
+.participants li button {
+    padding: 8px;
+}
+
+.attachments {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    background-color: $grey3;
+    border-radius: 10px;
+    align-items: flex-start;
+    padding-right: 32px;
+}
+
+.participants li button,
+.participants li h2 {
+    margin-left: auto;
+    padding-right: 30px;
+}
+
+.buttons {
+    display: flex;
+}
+
+.buttons #addParticipant {
+    align-self: flex-start;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.changePhotoChat {
+    right: 100px;
+    bottom: 0;
+    position: absolute;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.positionAttachments {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+div {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

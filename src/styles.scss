@@ -1,1 +1,93 @@
-/* You can add global styles to this file, and also import other style files */
+$grey1: #898989;
+$grey3: #242424;
+$white: #ffffff;
+
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: $white;
+    margin: 0;
+    overflow: hidden;
+}
+
+input {
+    font-family: 'Roboto', sans-serif;
+}
+
+input::placeholder {
+    font-family: 'Roboto', sans-serif;
+}
+
+p {
+    margin: 0;
+    overflow-wrap: break-word;
+}
+
+h1 {
+    font-weight: lighter;
+    font-size: 16px;
+    margin: 0;
+    opacity: 0.9;
+    overflow-wrap: break-word;
+}
+
+h2 {
+    font-size: 14px;
+    font-weight: lighter;
+    margin: 0;
+    color: $grey1;
+    overflow-wrap: break-word;
+}
+
+button {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+}
+
+ul {
+    padding-left: 0;
+}
+
+li {
+    list-style-type: none;
+}
+
+input {
+    outline: none !important;
+    border: none;
+    color: $white;
+}
+
+.participants li,
+.removalChat,
+.attachments {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 7px 0 7px 32px;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    // overflow-x: hidden;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: $grey1;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: 8px !important;
+    background-color: $grey3 !important;
+    height: auto !important;
+}
+
+::selection {
+    background-color: rgb(158, 134, 115);
+    color: #000000;
+}

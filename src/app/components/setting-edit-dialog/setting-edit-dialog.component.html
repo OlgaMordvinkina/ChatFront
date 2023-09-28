@@ -1,0 +1,65 @@
+<div class="positionContent">
+    <h2 class="text-center" *ngIf="data === 'PHOTO'" mat-dialog-title>Выберите новое фото профиля</h2>
+    <h2 class="text-center" *ngIf="data === 'NAME'" mat-dialog-title>Введите имя и фамилию</h2>
+    <h2 class="text-center" *ngIf="data === 'EMAIL'" mat-dialog-title>Введите новый адрес электронной почты</h2>
+    <h2 class="text-center" *ngIf="data === 'PASSWORD'" mat-dialog-title>Введите новый пароль</h2>
+    <h2 class="text-center" *ngIf="data === 'SOUND'" mat-dialog-title>Выберите новый звук уведомлений</h2>
+    <h2 class="text-center" *ngIf="data === 'REGISTRATION'" mat-dialog-title>Регистрация</h2>
+</div>
+
+<div mat-dialog-content  style="display: inline; padding: 0px; margin: auto;">
+    <div class="positionContent">
+
+        <div class="photoPosition" *ngIf="data === 'PHOTO'">
+            <input type="file" id="fileInputPhoto" accept="image/jpeg" (click)="uploadPhotoUser()"/>
+            <img *ngIf="updatedUser.photoUser" id="attachmentMessage" [src]="updatedUser.photoUser" style="max-width: 60px; max-height: 60px;">
+        </div>
+ 
+        <p *ngIf="data === 'REGISTRATION'">Имя</p>
+        <input id="defineName" *ngIf="data === 'NAME' || data === 'REGISTRATION'" placeholder="Введите имя" [(ngModel)]="updatedUser.name" autocomplete="off" matInput type="text" required>
+        <p *ngIf="data === 'REGISTRATION'">Фамилия</p>
+        <input id="defineSurname" *ngIf="data === 'NAME' || data === 'REGISTRATION'" placeholder="Введите фамилию" [(ngModel)]="updatedUser.surname" autocomplete="off" matInput type="text" required>
+        <p *ngIf="data === 'REGISTRATION'">Почта</p>
+        <input id="defineEmail" *ngIf="data === 'EMAIL' || data === 'REGISTRATION'" placeholder="Введите адрес электронной почты" [(ngModel)]="updatedUser.email" autocomplete="off" matInput type="text" required>
+
+        <div class="statePasswords" *ngIf="data === 'PASSWORD' || (data === 'REGISTRATION' && updatedUser.password !== '')">
+            <p *ngIf="isLengthPassword() && !isPasswordValid()">Пароли не совпадают</p>
+            <p *ngIf="updatedUser.password != '' && !isLengthPassword()">Слишком короткий пароль</p>
+            <div class="checkmark" *ngIf="isPasswordValid()">
+                <svg id="svg1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 47 47">
+                <title>animation icon -OK-</title> 
+                      <circle fill="#4CAF50" cx="24" cy="24" r="21"/>
+                        <path class="path" fill= "none" stroke ="#000000" stroke-width ="1.5" stroke-dasharray= "70.2" stroke-dashoffset="70.2" 
+                        d="M 34.6 14.6  L 21 28.2 L 15.4 22.6 L 12.6 25.4 L 21 33.8 L 37.4 17.4z">
+                        <animate id="p1" attributeName="stroke-dashoffset" begin="0.2s" values="70.2;0" dur="0.4s" repeatCount="1" fill="freeze" calcMode="paced" restart="whenNotActive"/> 
+                        <animate id="f1" attributeName="fill" begin = "p1.end" values="#4CAF50; #000000"  dur="0.4s" fill="freeze" restart="whenNotActive" /> 
+                </path> 
+               </svg>
+            </div>
+        </div>
+        <p *ngIf="data === 'REGISTRATION' && updatedUser.password === ''">Пароль</p>
+        <input id="definePassword" *ngIf="data === 'PASSWORD' || data === 'REGISTRATION'" placeholder="Введите пароль" [(ngModel)]="updatedUser.password" autocomplete="off" matInput type="password" required>
+        <p *ngIf="data === 'REGISTRATION'">Повторите пароль</p>
+        <input id="definePasswordRepeat" *ngIf="data === 'PASSWORD' || data === 'REGISTRATION'" placeholder="Повторите пароль" [(ngModel)]="updatedUser.repeatPassword" autocomplete="off" matInput type="password" required>
+    
+        <div class="soundsContent" *ngIf="data === 'SOUND'">
+            <span *ngFor="let settingId of settingIds">
+                <input type="radio" 
+                       id="option{{ settingId }}" 
+                       name="options" 
+                       [value]="settingId" 
+                       [(ngModel)]="updatedUser.settingId">
+                <label for="option{{ settingId }}">Sound {{ settingId }}</label>
+              </span>
+        </div>
+        
+    </div>
+</div>
+
+<div class="buttons" mat-dialog-actions>
+    <button mat-raised-button class="but_wrapper" (click)="onNoClick()">Отмена</button>
+    <button class="right-align but_wrapper" (click)="registerUser()" [mat-dialog-close]="updatedUser" [disabled]="!isActive()" mat-raised-button color="primary">
+        <p *ngIf="data!=='REGISTRATION'">Готово</p>
+        <p *ngIf="data==='REGISTRATION'">Зарегистрироваться</p>
+    </button>
+</div>

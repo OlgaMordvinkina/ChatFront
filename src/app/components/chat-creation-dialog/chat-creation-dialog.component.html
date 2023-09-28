@@ -1,0 +1,36 @@
+<div class="positionContent">
+    <h2 class="text-center" mat-dialog-title *ngIf="(data.type === 'PRIVATE' || data.type === 'add_participant') && !defineTitle">Найти пользователя</h2>
+    <h2 class="text-center" mat-dialog-title *ngIf="data.type === 'GROUP' && !defineTitle">Создать групповой чат</h2>
+    <h2 class="text-center" mat-dialog-title *ngIf="data.type === 'GROUP' && defineTitle">Введите название чата</h2>
+</div>
+
+<div mat-dialog-content style="display: inline; padding: 0px; margin: auto;">
+    <div class="positionContent">
+        <input class="searchUserInput" matInput type="text" placeholder="Введите имя, фамилию или почту" *ngIf="!defineTitle" [(ngModel)]="desired" autocomplete="off" required>
+        <input class="defineTitleChat" matInput type="text" placeholder="Введите название чата" *ngIf="defineTitle" [(ngModel)]="newChat.title" autocomplete="off" required>
+    </div>
+
+    <div class="resultUsers" *ngIf="!defineTitle">
+        <div *ngIf="desired !== '' && users !== []">
+            <button id="participant{{ user.id }}" class="searchResults" *ngFor="let user of users" (click)="chooseUser(user)">
+                <div class="chatIcon">
+                    <img src="{{user.photo !== null ? user.photo : 'assets/icon-chats.svg'}}" style="border-radius: 50%; height: 36px; width: 36px;">
+                </div>
+                <div class="infoUser">
+                    <h2>{{ user.fullName }}</h2>
+                    <p>{{ user.email }}</p>
+                </div>
+                <!-- <div class="stateAdd">
+                    <img src="assets/successfully-icon.svg" >
+                </div> -->
+            </button>
+        </div> 
+    </div>
+</div>
+
+<div class="buttons" mat-dialog-actions>
+    <button mat-raised-button class="but_wrapper" (click)="onNoClick()">Отмена</button>
+    <button class="right-align but_wrapper" mat-raised-button color="primary" (click)="send()" *ngIf="(data.type === 'PRIVATE' && !defineTitle) || (data.type === 'GROUP' && defineTitle)" [disabled]="newChat.title === '' && userForCreationPrivateChat.id === null" [mat-dialog-close]="newChat">Готово</button>
+    <button class="right-align but_wrapper" mat-raised-button color="primary" *ngIf="data.type === 'add_participant'" [disabled]="newChat.title === '' && userForCreationPrivateChat.id === null" [mat-dialog-close]="userForCreationPrivateChat">Готово</button>
+    <button class="right-align but_wrapper" mat-raised-button color="primary" (click)="defineTitleChat()" *ngIf="data.type === 'GROUP' && !defineTitle" [disabled]="!isActive()">Далее</button>
+</div>

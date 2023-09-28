@@ -1,0 +1,27 @@
+<div class="login-content">
+    <div class="login-window">
+
+        <div class="positionContentLogin">
+            <h2 class="text-center">Вход</h2>
+        </div>
+        
+        <div style="display: inline; padding: 0px; margin: auto;">
+            <div class="positionContentLogin">
+                <p>Почта</p>
+                <input id="defineEmailLogin" placeholder="Введите адрес электронной почты" [(ngModel)]="user.email" autocomplete="off" matInput type="text" required>
+                <p>Пароль</p>
+                <input id="definePasswordLogin" placeholder="Введите пароль" [(ngModel)]="user.password" autocomplete="off" matInput type="password" required>
+                
+                <div class="wrongData">
+                   <p *ngIf="!isRightData">Неверный логин или пароль</p> 
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttonsLogin">
+            <button class="right-alignLogin but_wrapperLogin" type="submit" (click)="loginUser()" [mat-dialog-close]="user" [disabled]="!isActive()" color="primary">Войти</button>
+            <button class="right-alignLogin but_wrapperLogin" (click)="openRegisterDialog()" [mat-dialog-close]="user" color="primary">Регистрация</button>
+        </div>
+
+    </div>
+</div>

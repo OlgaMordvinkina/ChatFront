@@ -1,0 +1,23 @@
+<li id="chat{{ chat.chatId }}" class="chatElement" *ngFor="let chat of chatsPreview" (click)="openChat(chat.chatId)">
+    <div class="info">
+        <div class="chatIcon">
+            <img src="{{chat.photo !== null ? chat.photo : 'assets/icon-chats.svg'}}" style="border-radius: 50%; height: 52px; width: 52px;">
+        </div>
+        <div class="chatInfo">
+            <div class="chatInfoTop">
+                <h1 class="chatName">{{ chat.title }}</h1>
+                <h2 class="infoMessage">{{ chat.dateLastMessage }}</h2>
+            </div>
+            <div class="chatInfoBottom">
+                <h2>{{ chat.lastMessage }}</h2>
+                <img id="stateMessage{{ chat.chatId }}" *ngIf="chat.senderId === currentUserId" src="{{ getStateMessage(chat) }}">
+                <div id="stateAlienMessage" *ngIf="chat.senderId !== currentUserId && chat.unreadMessages !== 0"> {{ chat.unreadMessages }} </div>
+            </div>
+        </div>
+    </div>
+</li>
+
+<div class="createChat" style="z-index:99; position: absolute; bottom: 10px; right: 5px;">
+    <button class="creationGroupChat" (click)="createChat(typeGroupChat)" title="Создать групповой чат" style="background-image: url(assets/group-chat.svg);"></button>
+    <button class="creationPrivateChat" (click)="createChat(typePrivateChat)" title="Найти пользователя" style="background-image: url(assets/private-chat.svg);"></button>
+</div>

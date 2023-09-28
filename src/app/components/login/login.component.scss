@@ -1,0 +1,99 @@
+$orange: #944710;
+$black: #000000;
+$grey6: #050505;
+$grey5: #0e0e0e;
+$grey4: #1a1a1a;
+$grey3: #242424;
+$grey2: #353535;
+$grey1: #898989;
+$white: #ffffff;
+
+p {
+    color: black;
+}
+
+.login-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    height: 100vh;
+    background-color: black;
+    align-items: center;
+}
+
+.login-window {
+    width: 400px;
+    background-color: $grey2;
+    border-radius: 6px;
+    justify-self: center;
+    // padding: 20px 0;
+}
+.buttonsLogin {
+    padding: 0 30px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.but_wrapperLogin {
+    color: $white;
+    background-color: rgb(33, 33, 33);
+    border-radius: 8px;
+    margin: 0;
+    transition: 0.3s;
+    border: 1px solid $white;
+    padding: 10px 15px;
+}
+
+.but_wrapperLogin:hover {
+    opacity: .7;
+}
+
+button[disabled] {
+    opacity: 0.5;
+}
+
+button:not([disabled]) {
+    opacity: 1;
+}
+
+.positionContentLogin input {
+    padding: 8px 20px;
+    background-color: $black;
+    border-radius: 4px 4px;
+    width: 300px;
+    height: 30px;
+    margin: 1px;
+    align-self: center;
+    margin-bottom: 20px;
+}
+
+.positionContentLogin h2 {
+    color: $white;
+    font-size: 16px;
+    text-align: center;
+}
+
+.positionContentLogin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.positionContentLogin p {
+    margin: 0 0 4px 33px;
+    color: rgb(204, 204, 204);
+    font-size: 12px;
+}
+
+.wrongData {
+    height: 14px;
+}
+
+.wrongData p {
+    margin: 0 0 4px 33px;
+    color: red;
+    font-size: 12px;
+    font-style: italic;
+}

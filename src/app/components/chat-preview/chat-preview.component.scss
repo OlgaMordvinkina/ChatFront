@@ -1,0 +1,108 @@
+$orange: #944710;
+$black: #000000;
+
+.chatElement:hover .chatIcon {
+    background-color: $black;
+}
+
+.chatElement:hover {
+    background-color: rgba($color: $orange, $alpha: 0.3);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.info {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    margin: 0px 15px;
+    padding: 5px 0;
+}
+
+.chatIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: $orange;
+    margin-top: 5px;
+}
+
+.chatInfo {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    padding-left: 10px;
+}
+
+.chatInfoTop,
+.chatInfoBottom {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.chatInfoBottom {
+    margin-right: 0;
+    padding-top: 6px;
+}
+
+.chatInfoBottom h2 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.chatInfoBottom img {
+    display: flex;
+    justify-self: end;
+}
+
+.chatInfoTop {
+    padding: 6px 0;
+}
+
+.chatName {
+    justify-content: start;
+}
+
+.infoMessage {
+    text-align: right;
+}
+
+.createChat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.creationGroupChat,
+.creationPrivateChat {
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    width: 36px;
+    height: 36px;
+    margin: 5px;
+}
+
+.creationGroupChat {
+    margin-right: 12px;
+}
+
+#stateAlienMessage {
+    display: flex;
+    justify-self: end;
+    background-color: #D9D9D9;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    color: #000000;
+    align-items: center;
+    justify-content: center;
+    font-size: small;
+}
+
+div {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
