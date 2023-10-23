@@ -1,6 +1,7 @@
 export class ChatPreview {
     chatId: number | null;
     messageId: number | null;
+    companionId: number | null;
     title: string;
     photo: string | null;
     senderId: number | null;
@@ -11,7 +12,8 @@ export class ChatPreview {
   
     constructor() {
         this.chatId = null;
-        this.messageId = null
+        this.messageId = null;
+        this.companionId = null;
         this.title = "";
         this.photo = null;
         this.senderId = null;

@@ -19,23 +19,13 @@ export class LocalStorageService {
   private _isForwardingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public forwarding = this._isForwardingSubject.asObservable();
 
-  // private _userIdSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  // public user_id = this._userIdSubject.asObservable();
+  private _isOpenRightPanelSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public isOpenRightPanel = this._isOpenRightPanelSubject.asObservable();
+
+  private selectedEmogiSubject = new BehaviorSubject<any>(null);
+  public selectedEmogi$ = this.selectedEmogiSubject.asObservable();
 
   public static get CURRENT_USER_ID(): number {
-    // if (id === 0) {
-    //   this.baseService.getUserByEmail(response.username).subscribe(
-    //     (fullUser: User) => {
-    //       if (fullUser && fullUser.id) {
-    //         localStorage.setItem(LocalStorageService.ID, JSON.stringify(fullUser.id));
-    //       }
-    //     });
-    //   id = Number(localStorage.getItem(LocalStorageService.ID));
-    // }
-    // if (id !== 0) {
-    //     const localStorageService = new LocalStorageService();
-    //     localStorageService.updateUserId(id);
-    // }
     return Number(localStorage.getItem(LocalStorageService.ID));
   }
 
@@ -47,10 +37,11 @@ export class LocalStorageService {
   public static get GET_SETTING_PROFILE_ID(): number { return Number(localStorage.getItem(LocalStorageService.SETTING_PROFILE_ID)); };
 
   updateChatPreviews(chatPreviews: ChatPreview[]) {
-      this._chatPreviewSubject.next(chatPreviews);
+    this._chatPreviewSubject.next(chatPreviews);
   }
 
   updateMessages(openChatId: number, messages: Message[]) {
+    this.sortMessages(messages);
       this._messagesSubject.next({ chatId: openChatId, messages: messages });
   }
 
@@ -58,9 +49,9 @@ export class LocalStorageService {
     this._isForwardingSubject.next(isForwarding);
   }
 
-  // updateUserId(userId: number) {
-  //   this._userIdSubject.next(userId);
-  // }
+  updateIsOpenRightPanel(isOpenRightPanel: boolean) {
+    this._isOpenRightPanelSubject.next(isOpenRightPanel);
+  }
 
   addMessage(message: Message, openChatId: number) {
     const currentMessages = this._messagesSubject.value;
@@ -72,8 +63,19 @@ export class LocalStorageService {
     } else {
       currentMessages.messages.push(message);
     }
-    
+    this.sortMessages(currentMessages.messages);
     this._messagesSubject.next(currentMessages);
+    }
+  }
+
+  addMessages(messages: Message[], openChatId: number) {
+    const currentMessages = this._messagesSubject.value;
+    this.sortMessages(messages);
+    const filteredMessages = messages.filter(message => message.chat?.id === openChatId);
+    if (filteredMessages.length > 0) {
+      currentMessages.messages.unshift(...filteredMessages);
+      this.sortMessages(currentMessages.messages);
+      this._messagesSubject.next(currentMessages);
     }
   }
 
@@ -92,6 +94,10 @@ export class LocalStorageService {
     
     this._messagesSubject.next(currentMessages);
   }
+
+  setSelectedEmogi(emogi: any) {
+    this.selectedEmogiSubject.next(emogi);
+  }
     
   private logoutEvent = new Subject<void>();
   logoutEvent$ = this.logoutEvent.asObservable();
@@ -99,4 +105,24 @@ export class LocalStorageService {
     this.logoutEvent.next();
     callback();
   }
+
+  private sortMessages(messages: Message[]) {
+    messages.sort((a, b) => {
+      if (a.id === null && b.id === null) {
+        return 0;
+      } else if (a.id === null) {
+        return 1;
+      } else if (b.id === null) {
+        return -1;
+      } else {
+        return a.id - b.id;
+      }
+    });
+  }
 }
+
+const TypeBucket = {
+  ATTACHMENTS_CHAT: 'attachmentschat',
+  CHAT: 'chat',
+  USER: 'user'
+};

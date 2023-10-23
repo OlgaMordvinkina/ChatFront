@@ -35,6 +35,7 @@ $white: #ffffff;
 
 .chats {
     position: relative;
+    overflow-y: auto;
 }
 
 .searchInput {

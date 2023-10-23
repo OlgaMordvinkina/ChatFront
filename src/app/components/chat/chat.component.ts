@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -11,14 +11,13 @@ import { BaseServiceService } from 'src/app/services/base-service.service';
 import { EmogiDialogComponent } from '../emogi-dialog/emogi-dialog.component';
 import { LocalStorageService } from '../storage/localStorageService';
 import { ViewingImagesComponent } from '../viewing-images/viewing-images.component';
-// import { Picker } from 'emoji-mart';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit {
   currentUserId!: number;
   currentChat: Chat = new Chat(null, '', '', []);
   chatId!: number;
@@ -38,12 +37,14 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   isUpdate: boolean = false;
   private messagesSubscription!: Subscription;
   private logoutSubscription!: Subscription;
+  private emogiSubscription!: Subscription;
 
   constructor(private baseService: BaseServiceService, 
               private activateRoute: ActivatedRoute,
               private localStorage: LocalStorageService,
               public dialog: MatDialog,
-              private router: Router) {
+              private router: Router,
+              private el: ElementRef) {
                   this.currentUserId = LocalStorageService.CURRENT_USER_ID;
                   this.activateRoute.params.subscribe(params => {
                     this.openChat().then(() => {
@@ -55,7 +56,132 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
                         this.close();
                       }
                     });
-                  });        
+                  });
+    this.scrollToBottomFast();
+  }
+
+  ngOnInit(): void {
+    this.getMessages();
+    this.logoutSubscription = this.localStorage.logoutEvent$.subscribe(() => {
+      this.logout();
+    });
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.searchText !== '' && this.searchText !== this.oldSearchText) {
+      this.searchMessageInChat();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.messagesSubscription) {
+      this.messagesSubscription.unsubscribe();
+    }
+    if (this.logoutSubscription) {
+      this.logoutSubscription.unsubscribe();
+    }
+    if (this.emogiSubscription) {
+      this.emogiSubscription.unsubscribe();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.onScroll();
+  }
+
+  async openChat() {
+    this.initializerOpenChatId();
+
+    if (LocalStorageService.CURRENT_USER_ID !== 0, this.chatId) {
+      await this.baseService.getChat(LocalStorageService.CURRENT_USER_ID, this.chatId)
+      .toPromise()
+      .then((chat: Chat | undefined) => {
+        this.currentChat = chat!;
+          if (this.currentChat?.participants && this.currentChat?.participants.length > 0) {
+            this.currentChat.participants.sort((a, b) => {
+              if (a.type === 'ADMIN') return -1;
+              if (b.type === 'ADMIN') return 1;
+              return 0;
+          });
+        }
+        this.initializerProfile();
+        this.baseService.updateStateMessages(LocalStorageService.CURRENT_USER_ID, this.localStorage.GET_OPEN_CHAT_ID(this.router)).subscribe();
+        this.messages = {chatId: 0, messages: []};
+
+        setTimeout(async() => {
+          await this.baseService.getMessages(LocalStorageService.CURRENT_USER_ID, this.chatId, null).toPromise().then((messages: Message[] | undefined) => {
+            this.localStorage.updateMessages(this.chatId, messages!);
+            if (this.currentChat.id && messages) {
+              this.messages = {chatId: this.currentChat.id, messages: messages! };
+              // this.localStorage.addMessages(messages, this.currentChat.id);
+            }
+          });
+        }, 100);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.close();
+      });
+    }
+    
+    if (this.newMsg.forwardedFrom) {
+      this.createMessage();
+      this.newMsg.forwardedFrom = null;
+      this.localStorage.updateIsForwarding(false);
+    }
+    this.scrollToBottomFast();
+
+    this.newMessage = '';
+  }
+
+  page: number = 2;
+  loading: boolean = false; 
+  getMessagePages() {
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+    this.baseService.getMessages(LocalStorageService.CURRENT_USER_ID, this.chatId, this.page).toPromise().then((messages: Message[] | undefined) => {
+      if (messages?.length === 0) {
+        return;
+      }
+      this.localStorage.addMessages(messages!, this.chatId);
+      ++this.page;
+      this.loading = false;
+
+    });
+
+    setTimeout(() => {
+      this.scroll();
+    }, 150);
+  }
+
+  prevScrollHeight: number = 0;
+  @ViewChild('messageContainer', { static: false }) scrollContainer!: ElementRef;
+  onScroll() {
+    const container = this.scrollContainer.nativeElement;
+    container.addEventListener('scroll', (event: any) => {
+      if (container.scrollTop <= 200) {
+        this.prevScrollHeight = container.scrollHeight;
+        this.getMessagePages();
+      }
+    });
+  }
+
+  scroll() {
+    const container = this.scrollContainer.nativeElement;
+    container.scrollTop = container.scrollHeight - this.prevScrollHeight;
+  }
+
+  initializerProfile() {
+    if (this.currentChat.type === 'PRIVATE') {
+      const id = this.currentChat.participants.find(it=> it.id !== this.currentUserId)?.id;
+      if (id) {
+        this.baseService.getProfile(id).subscribe((profile: Profile) => 
+          this.profile = profile
+        );
+      }
+    }
   }
 
   uploadAttachments() {
@@ -110,75 +236,6 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     if (chatId) {
       this.chatId = parseInt(chatId);
       localStorage.setItem(LocalStorageService.OPEN_CHAT_ID, chatId);
-    }
-  }
-
-  ngOnInit(): void {
-    this.getMessages();
-    this.logoutSubscription = this.localStorage.logoutEvent$.subscribe(() => {
-      this.logout();
-    });
-  }
-
-  ngAfterViewChecked(): void {
-    if (this.searchText !== '' && this.searchText !== this.oldSearchText) {
-      this.searchMessageInChat();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.messagesSubscription) {
-      this.messagesSubscription.unsubscribe();
-    }
-    if (this.logoutSubscription) {
-      this.logoutSubscription.unsubscribe();
-    }
-  }
-
-  async openChat() {
-    this.initializerOpenChatId();
-
-    if (LocalStorageService.CURRENT_USER_ID !== 0, this.chatId) {
-      await this.baseService.getChat(LocalStorageService.CURRENT_USER_ID, this.chatId)
-      .toPromise()
-      .then((chat: Chat | undefined) => {
-        this.currentChat = chat!;
-        this.initializerProfile();
-        this.baseService.updateStateMessages(LocalStorageService.CURRENT_USER_ID, this.localStorage.GET_OPEN_CHAT_ID(this.router)).subscribe();
-        this.messages = {chatId: 0, messages: []};
-
-        setTimeout(async() => {
-          await this.baseService.getMessages(LocalStorageService.CURRENT_USER_ID, this.chatId).toPromise().then((messages: Message[] | undefined) => {
-            this.localStorage.updateMessages(this.chatId, messages!);
-            if (this.currentChat.id) {
-              this.messages = {chatId: this.currentChat.id, messages: messages! };
-            }
-          });
-        }, 100);
-      })
-      .catch((error) => {
-        console.log(error);
-        this.close();
-      });
-    }
-    
-    if (this.newMsg.forwardFrom) {
-      this.createMessage();
-      this.newMsg.forwardFrom = null;
-      this.localStorage.updateIsForwarding(false);
-    }
-
-    this.newMessage = '';
-  }
-
-  initializerProfile() {
-    if (this.currentChat.type === 'PRIVATE') {
-      const id = this.currentChat.participants.find(it=> it.id !== this.currentUserId)?.id;
-      if (id) {
-        this.baseService.getProfile(id).subscribe((profile: Profile) => 
-          this.profile = profile
-        );
-      }
     }
   }
 
@@ -247,6 +304,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     const menuChat = document.getElementById('menuChat');
 
     if (rightMenu && menuChat) {
+      this.localStorage.updateIsOpenRightPanel(true);
       rightMenu.style.display = 'grid';
       this.blurredBackgroundAdd();
       setTimeout(() => {
@@ -266,7 +324,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   createMessage(): Message {
     this.newMessage = this.newMessage.replace(/\s+/g, ' ');
-    if ((this.newMessage !== '' || this.newMsg.forwardFrom) && this.currentChat.id) {
+    if ((this.newMessage !== '' || this.newMsg.forwardedFrom || this.newMsg.attachments.length > 0) && this.currentChat.id) {
       this.newMsg.sender = new Profile(this.currentUserId);
       this.newMsg.chat = new Chat(this.currentChat.id, '',null, []);
       this.newMsg.text = this.newMessage;
@@ -275,7 +333,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         // this.newMsg = result;
         this.openChat();
         this.newMessage = '';
-        this.newMsg.forwardFrom = null;
+        this.newMsg.forwardedFrom = null;
         setTimeout(() => {
           this.scrollToBottomSmoothly();
         }, 200);
@@ -285,9 +343,10 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
     setTimeout(() => {
       this.updateChatPreviews(LocalStorageService.CURRENT_USER_ID);
+      // this.scrollToBottomFast();
     }, 200);
     this.removeReplyToMessage();
-    this.newMsg.forwardFrom = null;
+    this.newMsg.forwardedFrom = null;
     return this.newMsg;
   }
 
@@ -427,32 +486,32 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   forwardMessage(message: Message) {
     this.activeMessageId = null;
-    this.newMsg.forwardFrom = [];
+    this.newMsg.forwardedFrom = [];
     this.addForwardMessage(message);
   }
 
   addForwardMessage(message: Message) {
-    if (this.newMsg.forwardFrom) {
+    if (this.newMsg.forwardedFrom) {
       const msgBlock = document.getElementById('message'+message.id);
       const width = 2;
-      const index = this.newMsg.forwardFrom.findIndex(it => it.id === message.id);
+      const index = this.newMsg.forwardedFrom.findIndex(it => it.id === message.id);
       if (index === -1) {
-        this.newMsg.forwardFrom.push(message);
+        this.newMsg.forwardedFrom.push(message);
         if (msgBlock) {
           msgBlock.style.padding = '6px 12px';
           msgBlock.style.border = width+'px solid #787878';
         }
-        if (this.newMsg.forwardFrom.length !== 0) {
+        if (this.newMsg.forwardedFrom.length !== 0) {
           this.localStorage.updateIsForwarding(true);
         }
       } else {
-        this.newMsg.forwardFrom.splice(index, 1);
+        this.newMsg.forwardedFrom.splice(index, 1);
         if (msgBlock) {
           msgBlock.style.border = 'none';
           msgBlock.style.padding = '8px 14px';
         }
-        if (this.newMsg.forwardFrom.length === 0) {
-          this.newMsg.forwardFrom = null;
+        if (this.newMsg.forwardedFrom.length === 0) {
+          this.newMsg.forwardedFrom = null;
           this.localStorage.updateIsForwarding(false);
         }
       }
@@ -460,8 +519,8 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
   
   isForward(message: Message): boolean {
-    if (this.newMsg.forwardFrom) {
-      const result = this.newMsg.forwardFrom.find(it => it.id === message.id);
+    if (this.newMsg.forwardedFrom) {
+      const result = this.newMsg.forwardedFrom.find(it => it.id === message.id);
       if (result) {
         return true;
       }
@@ -529,19 +588,25 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     return this.newMessage.trim().replace(/\n/g, '') !== '' || this.newMsg.attachments.length > 0;
   }
 
-  isEmogi: boolean = false;
-
-  openDialog() {
-    if (this.isEmogi) {
-      this.isEmogi = false;
-    } else {
-      this.isEmogi = true;
-    }
+  openDialogEmogi() {
+    const dialogEmogi = 
+    this.dialog.open(EmogiDialogComponent, {
+      position: {
+        right: '40px',
+        bottom: '70px'
+      },
+      panelClass: 'emogiDialogContainer'
+    });
     
-  }
-  showEmojiPicker() {
-    // const picker = new Picker({});
-    // picker.openPicker();
+    const subscribe = this.localStorage.selectedEmogi$.subscribe((emogi) => {
+      if (emogi) {
+        this.newMessage = `${this.newMessage}${emogi}`;
+      }
+    });
+    dialogEmogi.afterClosed().subscribe((emogi: any) => {
+        this.localStorage.setSelectedEmogi(null);
+        subscribe.unsubscribe();
+    });
   }
 
   formatDate(dateString: Date | null): string {

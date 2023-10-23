@@ -61,6 +61,7 @@ export class MainComponent implements OnInit, AfterViewChecked, OnDestroy {
   closeChat(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       this.close();
+      this.localStorage.updateIsForwarding(false);
     }
   }
 

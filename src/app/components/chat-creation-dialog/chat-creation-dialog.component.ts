@@ -126,7 +126,7 @@ export class ChatCreationDialogComponent implements OnInit, AfterViewChecked {
       this.currentChat = chat;
     });
 
-    this.baseService.getMessages(LocalStorageService.CURRENT_USER_ID, chatId).subscribe((messages: Message[]) => {
+    this.baseService.getMessages(LocalStorageService.CURRENT_USER_ID, chatId, null).subscribe((messages: Message[]) => {
       this.messages = messages;
     });
   }

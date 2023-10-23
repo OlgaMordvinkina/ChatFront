@@ -349,7 +349,7 @@ label {
 }
 
 .replyMessage,
-.forwardFrom {
+.forwardedFrom {
     padding: 4px 4px 4px;
     border-radius: 5px;
     color: #fff;
@@ -403,46 +403,46 @@ label {
     filter: brightness(0.3);
 }
 
-.forwardFrom {
+.forwardedFrom {
     margin-bottom: 5px;
     border-radius: 15px;
 }
 
-.forwardFrom .authorMessage {
+.forwardedFrom .authorMessage {
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-.own-message .forwardFrom .authorMessage  {
+.own-message .forwardedFrom .authorMessage  {
     color: $orange;
 }
 
-.other-message .forwardFrom .authorMessage  {
+.other-message .forwardedFrom .authorMessage  {
     color: rgb(78, 78, 78);
 }
 
-.own-message .forwardFrom.own {
+.own-message .forwardedFrom.own {
     background-color: #441c00;
 }
 
-.forwardFrom.own {
+.forwardedFrom.own {
     background-color: #141414;
 }
 
-.other-message .forwardFrom.other {
+.other-message .forwardedFrom.other {
     background-color: #000000;
 }
 
-.forwardFrom.other {
+.forwardedFrom.other {
     background-color: #2a1515;
 }
 
-.all-message .forwardFrom {
+.all-message .forwardedFrom {
     color: rgb(255, 255, 255, 0.5);
 }
 
-.forwardFrom .authorMessage,
-.forwardFrom .contentForwardMessage {
+.forwardedFrom .authorMessage,
+.forwardedFrom .contentForwardMessage {
     margin: 4px;
 }
 
@@ -483,4 +483,10 @@ label {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+.senderIcon {
+    position: absolute;
+    left: -46px;
+    bottom: 0;
 }

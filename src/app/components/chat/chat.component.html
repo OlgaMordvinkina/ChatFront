@@ -35,7 +35,8 @@
     <div id="chatsContent" class="chat-container" #messageContainer>
         <div class="text" *ngIf="messages.messages.length === 0 && messages.chatId !== 0">Напишите первым!</div>
 
-        <div  id="message{{ message.id }}" class="all-message" *ngFor="let message of messages.messages" [ngClass]="{'own-message': equals(message.sender?.userId), 'other-message': !equals(message.sender?.userId)}" (contextmenu)="handleContextMenu($event, message)">
+        <div id="message{{ message.id }}" class="all-message" *ngFor="let message of messages.messages" [ngClass]="{'own-message': equals(message.sender?.userId), 'other-message': !equals(message.sender?.userId)}" (contextmenu)="handleContextMenu($event, message)">
+            <div class="senderIcon" *ngIf="currentChat.type === 'GROUP' && message?.sender?.id !== currentUserId"><img src="{{message.sender?.photo !== null ? message.sender?.photo : 'assets/icon-chats.svg'}}" style="border-radius: 50%; height: 36px; width: 36px;"></div>
             <div class="message" [title]="formatDate(message.createDate)" (click)="addForwardMessage(message)">
                 <img class="forwardMessages" *ngIf="isForward(message)" src="assets/sent-message-icon.svg">
 
@@ -57,7 +58,7 @@
                     </button>
                 </div>
 
-                <div *ngFor="let msg of message.forwardFrom" class="forwardFrom" [ngClass]="{'own': msg.sender?.id === currentUserId, 'other': msg.sender?.id !== currentUserId}">
+                <div *ngFor="let msg of message.forwardedFrom" class="forwardedFrom" [ngClass]="{'own': msg.sender?.id === currentUserId, 'other': msg.sender?.id !== currentUserId}">
                     <div *ngIf="msg.sender?.id !== currentUserId" class="authorMessage">{{msg.sender?.surname}} {{msg.sender?.name}}:</div>
                     <div *ngIf="msg.sender?.id === currentUserId" class="authorMessage">Вы:</div>
                     <div class="contentForwardMessage">
@@ -79,12 +80,12 @@
     
 
     <div class="writing">
-        <div *ngIf="replyMessage?.id !== null" class="replyMessages">
+        <div *ngIf="replyMessage?.id" class="replyMessages">
             <div class="replyMessagesContent">
                 <div *ngIf="replyMessage.id !== 0">
                     <div *ngIf="replyMessage?.sender?.id !== currentUserId" class="authorMessage">{{replyMessage.sender?.surname}} {{replyMessage.sender?.name}}:</div>
                     <div *ngIf="replyMessage?.sender?.id === currentUserId" class="authorMessage">Вы:</div>
-                    <div class="contentMessage">{{replyMessage.text}}</div>  
+                    <div class="contentMessage">{{replyMessage.text}}</div>
                 </div>
             </div>
                 
@@ -116,15 +117,9 @@
             <textarea type="text" [(ngModel)]="newMessage" class="entryField" placeholder="Введите сообщение" (keydown)="onKeyDown($event)" value="newMessage" rows="1"></textarea>
         </div>
         <div class="messageActions">
-            <button (click)="openDialog()"><img src="assets/smile-icon.svg"></button>
+            <button (click)="openDialogEmogi()"><img src="assets/smile-icon.svg"></button>
             <button id="sendMessage" (click)="sendMessage()" [disabled]="!isValidMessage()"><img src="assets/sending-message-icon.svg"></button>
         </div>
-
-        <!-- <div id="modal_emogi" *ngIf="isEmogi">
-            <button id="emogi_list" *ngFor="let message of foundMessages">
-                <div class="emogi"><p>emoji</p></div>
-            </button>
-        </div> -->
    </div> 
-   <app-right-side-panel id="rightMenu" style="display: none;" [currentChat]="currentChat" [profile]="profile" (blurredBackgroundRemoveEmit)="blurredBackgroundRemove()"></app-right-side-panel>
+   <app-right-side-panel id="rightMenu" style="display: none;" [currentChat]="currentChat" [profile]="profile" (blurredBackgroundRemoveEmit)="blurredBackgroundRemove()" #rightMenu></app-right-side-panel>
 </div>

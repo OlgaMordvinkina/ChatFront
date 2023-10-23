@@ -91,3 +91,11 @@ input {
     background-color: rgb(158, 134, 115);
     color: #000000;
 }
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    overflow-x: hidden !important;
+}
+
+.transparentBackground {
+    background-color: rgb(0, 0, 0, 0) !important;
+}

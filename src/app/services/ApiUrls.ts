@@ -9,8 +9,25 @@ export class ApiUrls {
     public static CREATE_CHAT(userId: number): string { return `/api/users/${userId}/chats`; };
     public static DELETE_CHAT(userId: number, chatId: number): string { return `/api/users/${userId}/chats/${chatId}`; };
     public static UPDATE_PHOTO_CHAT(userId: number, chatId: number): string { return `/api/users/${userId}/chats/${chatId}`; };
+    public static GET_ATTACHMENTS_CHAT(userId: number, chatId: number, page: number | null, size: number | null): string {
+        var url = `/api/users/${userId}/chats/${chatId}/attachments`;
+        const queryParams = [];
+        if (page !== null) {
+            queryParams.push(`page=${page}`);
+        }
+        if (size !== null) {
+            queryParams.push(`size=${size}`);
+        }
+        if (queryParams.length > 0) {
+            url += '?' + queryParams.join('&');
+        }
+        return url;
+    };
 
-    public static GET_MESSAGE(userId: number, chatId: number): string { return `/api/users/${userId}/chats/${chatId}/messages`; };
+    public static GET_MESSAGE(userId: number, chatId: number, page: number | null): string {
+        const url = `/api/users/${userId}/chats/${chatId}/messages`;
+        return page === null ? url : `${url}?page=${page}`;
+    };
     public static CREATE_MESSAGE(userId: number, chatId: number): string { return `/api/users/${userId}/chats/${chatId}/messages`; };
     public static UPDATE_MESSAGE(userId: number, chatId: number): string { return `/api/users/${userId}/chats/${chatId}/messages`; };
     public static DELETE_MESSAGE(userId: number, chatId: number, messageId: number): string { return `/api/users/${userId}/chats/${chatId}/messages/${messageId}`; };

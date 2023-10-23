@@ -14,38 +14,39 @@
         <h1>{{ currentChat.title }}</h1>
         <h2>{{ getNumberParticipantsOrEmail() }}</h2>
     </div>
-
-    <ul class="participants" *ngIf="currentChat.type === 'GROUP'">
-        <li *ngFor="let participant of currentChat.participants">
-            <img src="{{participant.photo !== null ? participant.photo : 'assets/icon-chats.svg'}}" width="52" height="52" style="border-radius: 50%;">
-            <h1>{{ participant.fullName }}</h1>
-            <button (click)="deleteParticipant(participant)" *ngIf="participant.type !== 'ADMIN' && isAdmin()"><img src="assets/trash-can-icon.svg" width="15" height="15" style="opacity: .5;"></button>
-            <h2 *ngIf="participant.type === 'ADMIN'">admin</h2>
-        </li>
-    </ul>
-
-    <div class="buttons">
-       <button class="removalChat" *ngIf="currentChat.type === 'GROUP' && isAdmin()" (click)="deleteChat(currentChat)">
-            <img src="assets/trash-can-icon.svg" width="24" height="24">
-            <h1>Удалить чат</h1>
-        </button> 
-
-        <button *ngIf="currentChat.type === 'GROUP'" id="addParticipant" (click)="addParticipantInChat()">
-            <img src="assets/private-chat-light.svg" width="36" height="36">
-        </button>
-    </div>
+    <div class="scrollContainer">
+        <ul class="participants" *ngIf="currentChat.type === 'GROUP'" #participants>
+            <li *ngFor="let participant of currentChat.participants">
+                <img src="{{participant.photo !== null ? participant.photo : 'assets/icon-chats.svg'}}" width="52" height="52" style="border-radius: 50%;">
+                <h1>{{ participant.fullName }}</h1>
+                <button (click)="deleteParticipant(participant)" *ngIf="participant.type !== 'ADMIN' && isAdmin()"><img src="assets/trash-can-icon.svg" width="15" height="15" style="opacity: .5;"></button>
+                <h2 *ngIf="participant.type === 'ADMIN'">admin</h2>
+            </li>
+        </ul>
     
-
-    <div class="attachments">
-        <h2>Вложения:</h2>
-
-        <div class="positionAttachments">
-            <div *ngFor="let attachment of currentChat.attachments">
-                <button  (click)="openDialogViewingImages(attachment.file)" style="width: 96px; height: 96px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    <img src="{{attachment.file}}" style=" width: auto; height: inherit; border-radius: 4px; object-fit: contain;">
-                </button> 
+        <div class="buttons">
+           <button class="removalChat" *ngIf="currentChat.type === 'GROUP' && isAdmin()" (click)="deleteChat(currentChat)">
+                <img src="assets/trash-can-icon.svg" width="24" height="24">
+                <h1>Удалить чат</h1>
+            </button> 
+    
+            <button *ngIf="currentChat.type === 'GROUP'" id="addParticipant" (click)="addParticipantInChat()">
+                <img src="assets/private-chat-light.svg" width="36" height="36">
+            </button>
+        </div>
+        
+    
+        <div class="attachments">
+            <h2>Вложения:</h2>
+    
+            <div class="positionAttachments" (scroll)="onScroll($event)" #attachmentContainer>
+                <div class="attachment{{ attachment.id }}" *ngFor="let attachment of currentChat.attachments" #attachment>
+                    <button  (click)="openDialogViewingImages(attachment.file)" style="width: 96px; height: 96px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img src="{{attachment.file}}" style=" width: auto; height: inherit; border-radius: 4px; object-fit: contain;">
+                    </button> 
+                </div>           
             </div>
-                        
         </div>
     </div>
+   
 </div>

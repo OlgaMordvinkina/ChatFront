@@ -10,7 +10,7 @@ export class Message {
     state: string | null;
     text: string;
     replyMessage: Message | null;
-    forwardFrom: Message[] | null;
+    forwardedFrom: Message[] | null;
     attachments: {id: number, file: String}[];
     typeMessage: string;
 
@@ -22,7 +22,7 @@ export class Message {
         this.state = null;
         this.text = '';
         this.replyMessage = null;
-        this.forwardFrom = null;
+        this.forwardedFrom = null;
         this.attachments = [];
         this.typeMessage = '';
     }

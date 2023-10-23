@@ -12,6 +12,7 @@ import { UserRegister } from '../models/UserRegister';
 import { Buffer } from 'buffer';
 import { LocalStorageService } from '../components/storage/localStorageService';
 import { ApiUrls } from './ApiUrls';
+import { Attachment } from '../models/Attachment';
 
 @Injectable({
   providedIn: 'root'
@@ -40,10 +41,14 @@ export class BaseServiceService {
     return this.http.put<Chat>(ApiUrls.UPDATE_PHOTO_CHAT(userId, chatId), photo, { headers: this.getHeaders() });
   }
 
+  getAttachmentsChat(userId: number, chatId: number, page: number | null, size: number | null): Observable<Attachment[]> {
+    return this.http.get<Attachment[]>(ApiUrls.GET_ATTACHMENTS_CHAT(userId, chatId, page, size), { headers: this.getHeaders() });
+  }
 
 
-  getMessages(userId: number, chatId: number): Observable<Message[]> {
-    return this.http.get<Message[]>(ApiUrls.GET_MESSAGE(userId, chatId), { headers: this.getHeaders() });
+
+  getMessages(userId: number, chatId: number, page: number | null): Observable<Message[]> {
+    return this.http.get<Message[]>(ApiUrls.GET_MESSAGE(userId, chatId, page), { headers: this.getHeaders() });
   }
 
   createMessage(userId: number, chatId: number, newMessage: Message): Observable<Message> {

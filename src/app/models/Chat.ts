@@ -1,3 +1,4 @@
+import { Attachment } from "./Attachment";
 import { User } from "./User";
 
 export class Chat {
@@ -6,7 +7,7 @@ export class Chat {
     type: string | null;
     participants: User[];
     photo: string | null;
-    attachments: {id: number, file: string }[];
+    attachments: Attachment[];
 
     constructor(id: number | null, title: string, type: string | null, participants: User[]) {
         this.id = id;

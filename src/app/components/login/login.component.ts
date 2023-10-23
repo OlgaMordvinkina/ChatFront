@@ -43,12 +43,13 @@ export class LoginComponent implements OnInit {
     });
   }
   
-
   loginUser() {
     const user: LoginUser = new LoginUser(this.user.email.toLocaleLowerCase(), this.user.password);
     try {
       this.baseService.loginUser(user).subscribe(
         (response: any) => {
+          // const encodedCredentials = Buffer.from(`${user.username}:${user.password}`).toString('base64');
+          // localStorage.setItem(LocalStorageService.LOGIN, encodedCredentials);
           localStorage.setItem(LocalStorageService.EMAIL, response.username);
           this.baseService.getUserByEmail(response.username).subscribe(
             (fullUser: User) => {

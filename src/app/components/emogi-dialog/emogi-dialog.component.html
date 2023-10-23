@@ -1,1 +1,3 @@
-<p>emogi-dialog works!</p>
+<div class="emogiContainer">
+    <button *ngFor="let emg of emogi" (click)="selectEmogi(emg)">{{ emg }}</button>
+</div>

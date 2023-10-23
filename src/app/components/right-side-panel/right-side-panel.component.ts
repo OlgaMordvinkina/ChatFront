@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { Attachment } from 'src/app/models/Attachment';
 import { Chat } from 'src/app/models/Chat';
 import { ChatPreview } from 'src/app/models/ChatPreview';
 import { Profile } from 'src/app/models/Profile';
@@ -15,19 +17,83 @@ import { ViewingImagesComponent } from '../viewing-images/viewing-images.compone
   templateUrl: './right-side-panel.component.html',
   styleUrls: ['./right-side-panel.component.scss']
 })
-export class RightSidePanelComponent implements OnInit {
+export class RightSidePanelComponent implements OnInit, OnDestroy, AfterViewChecked {
   currentUserId: number = LocalStorageService.CURRENT_USER_ID;
   @Input() currentChat: Chat = new Chat(null, '', '', []);
   @Input() profile: Profile = new Profile(0);
 
   @Output() blurredBackgroundRemoveEmit = new EventEmitter();
+  @ViewChild('attachment', { static: false }) attachmentChat!: ElementRef;
+  @ViewChild('attachmentContainer', { static: false }) attachmentContainer!: ElementRef;
+
+  private isOpenRightChatSubscription!: Subscription;
+  // isOpenRightPanel: boolean = false;
+
 
   constructor(private baseService: BaseServiceService, 
-    private localStorage: LocalStorageService, 
-    private router: Router,
-    public dialog: MatDialog) {}
+              private localStorage: LocalStorageService, 
+              private router: Router,
+              public dialog: MatDialog) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+     this.isOpenRightChatSubscription = this.localStorage.isOpenRightPanel.subscribe(
+      (isOpen: boolean) => {
+        if (isOpen) {
+          this.getAttachments();
+        }
+        // this.isOpenRightPanel = isOpen;
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.isOpenRightChatSubscription) {
+      this.isOpenRightChatSubscription.unsubscribe();
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    // if (this.isOpenRightPanel) {
+    //   this.getAttachments();
+    // }
+  }
+
+  @ViewChild('attachmentContainer', { static: false }) scrollContainer!: ElementRef;
+  onScroll(event: Event) {
+    const container = this.scrollContainer.nativeElement;
+    container.addEventListener('scroll', (event: any) => {
+      if (container.scrollTop + container.clientHeight >= container.scrollHeight - 0 && !this.loading) {
+        this.getAttachments();
+      }
+    });
+  }
+
+  page: number = 1;
+  size: number | null = null;
+  loading: boolean = false;
+  getAttachments() {
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+    if (this.currentChat.id) {
+      this.baseService.getAttachmentsChat(this.currentUserId, this.currentChat.id, this.page, this.size).subscribe((attachment: Attachment[]) => {
+        if (attachment) {
+        if (!this.currentChat.attachments) {
+          this.currentChat.attachments = [];
+        }
+        this.currentChat.attachments.push(...attachment);
+        this.currentChat.attachments.sort((a, b) => {
+          if (b.id === null) return -1;
+          if (a.id === null) return 1;
+          return b.id - a.id;
+      });
+        ++this.page;
+        this.loading = false;
+        }});
+    }
+    // this.localStorage.updateIsOpenRightPanel(false);
+  }
 
   closeRightMenu() {
     const rightMenu = document.getElementById('rightMenu');
@@ -40,6 +106,8 @@ export class RightSidePanelComponent implements OnInit {
       }, 500);
       menuChat.style.transform = 'translateX(100%)';
     }
+    this.localStorage.updateIsOpenRightPanel(false);
+    this.page = 1;
   }
 
   getNumberParticipantsOrEmail(): string {
@@ -148,15 +216,17 @@ export class RightSidePanelComponent implements OnInit {
       });
 
       dialogCreationChat.afterClosed().subscribe((result: User) => {
-        const isExist = this.currentChat.participants.findIndex(participant => participant.id === result.id);
-        if (isExist === -1) {
-          if (result.id && this.currentChat.id) {
-            this.baseService.addParticipant(LocalStorageService.CURRENT_USER_ID, this.currentChat.id, result.id)
-            .subscribe((user: User) => {
-              this.currentChat.participants.push(user);
-            });  
-          }
-        }        
+        if (result) {
+          const isExist = this.currentChat.participants.findIndex(participant => participant.id === result.id);
+          if (isExist === -1) {
+            if (result.id && this.currentChat.id) {
+              this.baseService.addParticipant(LocalStorageService.CURRENT_USER_ID, this.currentChat.id, result.id)
+              .subscribe((user: User) => {
+                this.currentChat.participants.push(result);
+              });  
+            }
+          }   
+        }     
       });
     }
 

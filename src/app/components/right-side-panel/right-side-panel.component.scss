@@ -1,5 +1,11 @@
-$grey5: #0e0e0e;
+$grey1: #898989;
 $grey3: #242424;
+$grey5: #0e0e0e;
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(89, 89, 89, 0.8);
+}
 
 .zoneClosing {
     display: flex;
@@ -8,7 +14,8 @@ $grey3: #242424;
 }
 
 #menuChat {
-    display: inline-block;
+    // display: inline-block;
+    display: flex;
     flex-direction: column;
     background-color: $grey5;
     transition: transform 0.3s ease;
@@ -34,6 +41,8 @@ $grey3: #242424;
     border-radius: 14px;
     min-height: 68px;
     max-height: 300px;
+    border-top: 1px solid #404040;
+    border-bottom: 1px solid #404040;
 }
 
 .infoChatsParticipants {
@@ -60,7 +69,10 @@ $grey3: #242424;
     background-color: $grey3;
     border-radius: 10px;
     align-items: flex-start;
-    padding-right: 32px;
+    padding-right: 28px;
+    flex: 1;
+    max-height: 340px;
+    overflow-x: hidden;
 }
 
 .participants li button,
@@ -91,6 +103,7 @@ $grey3: #242424;
     display: flex;
     gap: 4px;
     flex-wrap: wrap;
+    overflow-y: auto;
 }
 
 div {

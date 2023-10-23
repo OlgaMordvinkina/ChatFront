@@ -12,6 +12,7 @@ import { LocalStorageService } from '../storage/localStorageService';
 import * as SockJS from 'sockjs-client';
 import { ApiUrls } from 'src/app/services/ApiUrls';
 import { Message } from 'src/app/models/Message';
+
 @Component({
   selector: 'app-chat-preview',
   templateUrl: './chat-preview.component.html',
@@ -74,6 +75,7 @@ export class ChatPreviewComponent implements OnInit, AfterContentInit, OnDestroy
   getChatPreview() {
     this.chatPreviewSubscription = this.localStorage.chat_prewiew.subscribe(
       (chatPreviews: ChatPreview[]) => {
+        debugger
         this.chatsPreview = chatPreviews;
       }
     );
@@ -273,4 +275,10 @@ const TypeMessage = {
   CREATE: 'CREATE',
   UPDATE: 'UPDATE',
   DELETE: 'DELETE'
+};
+
+const TypeBucket = {
+  ATTACHMENTS_CHAT: 'attachmentschat',
+  CHAT: 'chat',
+  USER: 'user'
 };
